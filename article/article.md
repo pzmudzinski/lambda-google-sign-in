@@ -23,18 +23,18 @@ Before reaching to any secured data we will use custom authorizer which will che
 Finally we can take a look at complete client and lambdas endpoints flow:
 ![complete flow](complete-flow.png)
 
-Seems easy, huh? We can...
+Ok, it should be _more or less_ clear, we can...
 
 ## Start coding!
 
 ![meme](programming-not-stressful.png)
 
-We will implement two parts of a project - our BE and FE. We will use `Typescript` on both.  
+We will implement two parts of a project - our BE and FE. We will use `Typescript` on both.
 Let's start with our API so we won't block our FE team.
 
 ### Lambdas
 
-We need three lambdas:
+We need three main parts on our serverless back end:
 
 - Authorizer for email domain verification
 - Secret data endpoint secured with authorizer
@@ -42,7 +42,7 @@ We need three lambdas:
 
 #### Authorizer
 
-We need to use [`google-auth-library`](https://www.npmjs.com/package/google-auth-library) for email domain verification, let's start by creating `verify` helper method:
+We will use [`google-auth-library`](https://www.npmjs.com/package/google-auth-library) for email domain verification, let's start by creating `verify` helper method:
 
 ```typescript
 const client = new OAuth2Client(CLIENT_ID);
@@ -70,7 +70,8 @@ async function verify(token?: string) {
 }
 ```
 
-In order to create `CLIENT_ID` for your google application you need to log to [developer console](http://developers.google.com) and click through those steps:
+You might notice we are passing `CLIENT_ID` for our `OAuth2Client`.  
+In order to create it you need to log to [developer console](http://developers.google.com) and click through those steps:
 
 1. Credentials
 2. Create Credentials
@@ -79,7 +80,11 @@ In order to create `CLIENT_ID` for your google application you need to log to [d
 5. Put name of your key
 6. Set authorized origins for debugging purposes (e.g. `http://localhost:3000`)
 
-`hd` stands for **hosted domain** and it's string containing email domain. Once we get it we simply check if it matches our requirements.
+We will pass both `CLIENT_ID` and `COMPANY_DOMAIN` via env variable.
+
+You are probably asking yourself what is that weird `payload.hd` line.
+
+`hd` stands for **hosted domain** and it is string containing email domain. Once we get it we simply check if it matches our requirements. In any other case we are throwing an `Error`.
 
 Once we have our `verify` function we can add `authorizer` and `verifyToken` endpoint:
 
@@ -108,7 +113,6 @@ export const verifyTokenHandler = async (
       body: "Success",
     };
   } catch (exception) {
-    console.error(exception, exception.stack);
     return {
       statusCode: 403,
       body: "Failure",
@@ -117,7 +121,7 @@ export const verifyTokenHandler = async (
 };
 ```
 
-`authorizationHandler` generates `allow` policy for all (thus `"*"`) resources, since if `AWS` caches policy response. If we used `event.methodArn` client would be able to execute only on response while getting `403` for all further ones. We could generate something more strict here, but for now let's keep it simple.
+`authorizationHandler` generates `allow` policy for all (thus `"*"`) resources, because of the way `AWS` caches policy response (based on `Authorization` header). If we used `event.methodArn` client would be able to execute only on response while getting `403` for all further ones (because of `arn` mismatch). We could generate something more strict here, but for now let's keep it simple.
 
 `verifyTokenHandler` returns `statusCode` according to sent token:
 
@@ -141,12 +145,11 @@ export const getData = async (
 };
 ```
 
+### Putting all together
+
 Now we can add our lambdas declarations to `serverless.yml` file:
 
 ```yaml
-environment:
-  GOOGLE_CLIENT_ID: "${env.GOOGLE_CLIENT_ID}"
-
 functions:
   authorizerFunc:
     handler: src/auth/controller.authorizationHandler
@@ -169,8 +172,10 @@ functions:
           authorizer: authorizerFunc
 ```
 
-We secure `getData` endpoint by using `authorizerFunc`.  
- It means whenever someone tries to call it it will be verified by our function.
+We expose two endpoints:
+
+- `GET /data` which points to `getData` handler, secured by our custom authorizer
+- `GET /auth/verify` which points to `verifyTokenHandler`
 
 Let's run our lambdas locally:
 
@@ -181,7 +186,14 @@ serverless offline
 You should see them running on `localhost`:
 ![serverless-offline result](serverless-offline.png)
 
-Huh, that was pretty easy, right?
+Calling `/dev/data` should throw `403` status error because of missing authorization header:
+
+```bash
+$ curl http://localhost:3000/dev/data
+{"statusCode":403,"error":"Forbidden","message":"User is not authorized to access this resource"}
+```
+
+Huh, that was pretty easy, right?  
 ![good job meme](meme-dwight.jpg)
 
-We can start playing with our endpoints now, but let's do that by implementing front end part. This is [part 2 ouf our article](#).
+We could start playing with our endpoints, but let's do that by implementing front end part. This is [part 2 ouf our article](#).
