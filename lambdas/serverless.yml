@@ -1,0 +1,44 @@
+service: google-sign-in-lambdas
+app: lambda-google-sign-in
+org: pzmudzinski
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+environment:
+  GOOGLE_CLIENT_ID: "${env.GOOGLE_CLIENT_ID}"
+
+functions:
+  authorizerFunc:
+    handler: src/auth/controller.authorizationHandler
+
+  verify-token:
+    handler: src/auth/controller.verifyTokenHandler
+    events:
+      - http:
+          path: auth/verify
+          method: get
+          cors: true
+
+  get-data:
+    handler: src/data/controller.getData
+    events:
+      - http:
+          path: data
+          method: get
+          cors: true
+          authorizer: authorizerFunc
+
+custom:
+  webpack:
+    webpackConfig: "webpack.config.js"
+    includeModules:
+      forceExclude:
+        - aws-sdk
+    packager: "yarn"
