@@ -10,6 +10,8 @@ In [last part](#) we implemented our serverless back end using AWS Lambda + Goog
 
 We need to do couple of things on login page:
 
+![login page flow](login-page-flow.png)
+
 1. Display Google sign in button
 2. Take token returned from Google authentication
 3. Validate token against our `/verify` endpoint
@@ -119,6 +121,6 @@ We implemented happy path for our authentication flow, now we would have to thin
 - What if user tries to open `/dashboard` without sign in?
 - What if user opens website after week of inactivity and saved token is invalid?
 
-
 ## Summary
-We created pretty simple solution for secured `AWS Lambda + API Gateway` endpoint. It's easy to deploy and valid approach for internal tools which should be accessible for internal employees / members only. Creating front end can be really quick with help of 3rd party libraries such as `react-google-login` or `react-router`. 
+
+We created pretty simple solution for secured `AWS Lambda + API Gateway` endpoint. It's easy to deploy and valid approach for internal tools which should be accessible for employees / members only. Creating front end can be really quick with help of 3rd party libraries such as `react-google-login` or `react-router`.
