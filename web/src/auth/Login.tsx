@@ -1,12 +1,13 @@
 import React, { useCallback, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { GoogleLogin } from "react-google-login";
 import { verifyToken, saveAuthToken } from "../api";
 
-export const Login = () => {
-  const [error, setError] = useState<string>();
-  const history = useHistory();
+type LoginProps = {
+  onSuccess: () => void;
+};
 
+export const Login = ({ onSuccess }: LoginProps) => {
+  const [error, setError] = useState<string>();
   const signIn = useCallback(
     async ({ tokenId }) => {
       try {
@@ -16,12 +17,12 @@ export const Login = () => {
           return;
         }
         saveAuthToken(tokenId);
-        history.replace("/");
+        onSuccess();
       } catch (exception) {
         setError("Something went wrong while logging in.");
       }
     },
-    [history]
+    [onSuccess]
   );
 
   return (

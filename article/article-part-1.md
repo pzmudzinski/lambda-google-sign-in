@@ -196,4 +196,4 @@ $ curl http://localhost:3000/dev/data
 Huh, that was pretty easy, right?  
 ![good job meme](meme-dwight.jpg)
 
-We could start playing with our endpoints, but let's do that by implementing front end part. This is [part 2 ouf our article](article-part-2.md).
+We could start playing with our endpoints, but let's do that by implementing front end part. This is [part 2 of our article](article-part-2.md).
