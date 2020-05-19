@@ -1,3 +1,17 @@
+---
+title: Secure AWS Lambda with Google email domain check - Part 1
+tags:
+  [
+    "AWS Lambda",
+    "Amazon API Gateway",
+    "React",
+    "react-router",
+    "web",
+    "typescript",
+  ]
+status: draft
+---
+
 # Secure AWS Lambda with Google email domain check - Part 1
 
 ## Preface

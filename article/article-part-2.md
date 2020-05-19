@@ -1,3 +1,17 @@
+---
+title: Secure AWS Lambda with Google email domain check - Part 2
+tags:
+  [
+    "AWS Lambda",
+    "Amazon API Gateway",
+    "React",
+    "react-router",
+    "web",
+    "typescript",
+  ]
+status: draft
+---
+
 # Secure AWS Lambda with Google email domain check - Part 2
 
 ## Preface
@@ -195,9 +209,7 @@ const isUnauthenticated = () => {
     <Login />
   </AuthenticatedRoute>
 
-  <AuthenticatedRoute  
-    authPredicate={isAuthenticated}  
-    redirectPath="/login">
+  <AuthenticatedRoute authPredicate={isAuthenticated} redirectPath="/login">
     <Dashboard />
   </AuthenticatedRoute>
 </Switch>;
@@ -244,7 +256,7 @@ We also need to add callback to our `Login` page:
 }/>
 ```
 
-Nice. Try to log in and then open `/login` path again. You should be redirected back to our dashboard. Similarly, if you open `/dashboard` you are asked to log in. In case of old `authToken` being stored in `LocalStorage` app will reach `AUTHENTICATION_FAILED` and sign in process would be repeated. 
+Nice. Try to log in and then open `/login` path again. You should be redirected back to our dashboard. Similarly, if you open `/dashboard` you are asked to log in. In case of old `authToken` being stored in `LocalStorage` app will reach `AUTHENTICATION_FAILED` and sign in process would be repeated.
 
 We are ready to deploy and get some :clap: from your coworkers.
 
